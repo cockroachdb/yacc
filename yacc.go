@@ -172,7 +172,7 @@ func init() {
 	flag.BoolVar(&lflag, "l", false, "disable line directives")
 }
 
-var stacksize = 200
+var initialstacksize = 16
 
 // communication variables between various I/O routines
 var infile string  // input file name
@@ -384,7 +384,7 @@ func setup() {
 	if flag.NArg() != 1 {
 		usage()
 	}
-	if stacksize < 1 {
+	if initialstacksize < 1 {
 		// never set so cannot happen
 		fmt.Fprintf(stderr, "yacc: stack size too small\n")
 		usage()
@@ -719,7 +719,7 @@ outer:
 	ftable.WriteRune('\n')
 	fmt.Fprintf(ftable, "const %sEofCode = 1\n", prefix)
 	fmt.Fprintf(ftable, "const %sErrCode = 2\n", prefix)
-	fmt.Fprintf(ftable, "const %sInitialStackSize = %v\n", prefix, stacksize)
+	fmt.Fprintf(ftable, "const %sInitialStackSize = %v\n", prefix, initialstacksize)
 
 	//
 	// copy any postfix code
