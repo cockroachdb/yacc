@@ -1,4 +1,4 @@
-# Yacc
+# Yacc [DEPRECATED]
 
 This project is deprecated and remains only to allow old versions of
 CockroachDB to build. CockroachDB uses the go yacc tool as of
