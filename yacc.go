@@ -17,7 +17,7 @@ file such as NOTICE, LICENCE or COPYING.
 	Portions Copyright © 2004,2006 Bruce Ellis
 	Portions Copyright © 2005-2007 C H Forsyth (forsyth@terzarima.net)
 	Revisions Copyright © 2000-2007 Lucent Technologies Inc. and others
-	Portions Copyright © 2009 The Go Authors.  All rights reserved.
+	Portions Copyright © 2009 The Go Authors. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -60,9 +60,9 @@ import (
 // the following are adjustable
 // according to memory size
 const (
-	ACTSIZE  = 50000
-	NSTATES  = 3000
-	TEMPSIZE = 3000
+	ACTSIZE  = 30000
+	NSTATES  = 2000
+	TEMPSIZE = 2000
 
 	SYMINC   = 50  // increase for non-term or term
 	RULEINC  = 50  // increase for max rule length prodptr[i]
@@ -71,7 +71,6 @@ const (
 	STATEINC = 200 // increase for states          statemem
 
 	NAMESIZE = 50
-	NTYPES   = 63
 	ISIZE    = 400
 
 	PRIVATE = 0xE000 // unicode private use
@@ -208,8 +207,8 @@ type Wset struct {
 }
 
 // storage of types
-var ntypes int             // number of types defined
-var typeset [NTYPES]string // pointers to type tags
+var ntypes int                 // number of types defined
+var typeset = map[int]string{} // pointers to type tags
 
 // token information
 
@@ -237,7 +236,6 @@ var defact = make([]int, NSTATES)  // default actions of states
 
 // lookahead set information
 
-var lkst []Lkset
 var nolook = 0  // flag to turn off lookahead computations
 var tbitset = 0 // size of lookahead sets
 var clset Lkset // temporary storage for lookahead computations
@@ -682,6 +680,10 @@ outer:
 		nprod++
 		moreprod()
 		levprd[nprod] = 0
+	}
+
+	if TEMPSIZE < ntokens+nnonter+1 {
+		errorf("too many tokens (%d) or non-terminals (%d)", ntokens, nnonter)
 	}
 
 	//
@@ -1284,8 +1286,9 @@ func dumpprod(curprod []int, max int) {
 func cpyact(curprod []int, max int) {
 
 	if !lflag {
-		fmt.Fprintf(fcode, "\n\t\t//line %v:%v\n\t\t", infile, lineno)
+		fmt.Fprintf(fcode, "\n\t\t//line %v:%v", infile, lineno)
 	}
+	fmt.Fprint(fcode, "\n\t\t")
 
 	lno := lineno
 	brac := 0
@@ -3184,8 +3187,6 @@ func isword(c rune) bool {
 	return c >= 0xa0 || c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
 }
 
-func mktemp(t string) string { return t }
-
 //
 // return 1 if 2 arrays are equal
 // return 0 if not equal
@@ -3201,13 +3202,6 @@ func aryeq(a []int, b []int) int {
 		}
 	}
 	return 1
-}
-
-func putrune(f *bufio.Writer, c int) {
-	s := string(c)
-	for i := 0; i < len(s); i++ {
-		f.WriteByte(s[i])
-	}
 }
 
 func getrune(f *bufio.Reader) rune {
