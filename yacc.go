@@ -71,7 +71,6 @@ const (
 	STATEINC = 200 // increase for states          statemem
 
 	NAMESIZE = 50
-	NTYPES   = 63
 	ISIZE    = 400
 
 	PRIVATE = 0xE000 // unicode private use
@@ -208,8 +207,8 @@ type Wset struct {
 }
 
 // storage of types
-var ntypes int             // number of types defined
-var typeset [NTYPES]string // pointers to type tags
+var ntypes int                 // number of types defined
+var typeset = map[int]string{} // pointers to type tags
 
 // token information
 
